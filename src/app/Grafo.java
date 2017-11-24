@@ -333,15 +333,13 @@ public class Grafo {
 	}
 
 	int[][] prim() {
-        // uso una copia de ady porque necesito eliminar columnas
     	int cantNodos = this.nodos.length;
     	int cantAristasMarcadas = 0;
     	final int INF = 9999;
         int[][] adyacencia = this.nodos;
         int[][] arbol = new int[cantNodos][cantNodos];
         boolean[] aristasMarcadas = new boolean[cantNodos];
-        //vector<int> :: iterator itVec;
-
+        
         // Inicializo las distancias del arbol en INF.
         for(int i = 0; i < cantNodos; i++) {
         	for(int j=0;j<cantNodos;j++) {
@@ -366,14 +364,22 @@ public class Grafo {
             int min = INF;
             for(int i=0; i<cantNodos; i++)
                 for(int j = 0; j < cantNodos; j++)
-                    if(min > adyacencia[i][j]){
+                    if(min > adyacencia[i][j] && adyacencia[i][j]!=0){
                         min = adyacencia[i][j];
                         padre = i;
-                        hijo = i;
+                        hijo = j;
                     }
 
             arbol[padre][hijo] = min;
             arbol[hijo][padre] = min;
+        }
+        
+        for(int i=0; i<cantNodos; i++) {
+        	for(int j=0; j<cantNodos; j++) {
+        		if(arbol[i][j]==INF) {
+        			arbol[i][j] = 0;
+        		}
+        	}
         }
         return arbol;
     }
