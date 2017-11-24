@@ -386,21 +386,29 @@ public class Grafo {
 	
 	
 	public int[][] floyd() {
-		int cantNodos = this.nodos.length+1;
+		int cantNodos = this.nodos.length;
 		int[][] distancias = this.nodos;// Arrays.copyOf(this.matAdyacencia, FINAL_ARRAY);
 
-		for (int k = 1; k < cantNodos; k++) {
-			for (int i = 1; i < cantNodos; i++) {
-				for (int j = 1; j < cantNodos; j++) {
+        for(int i=0; i<cantNodos; i++) {
+        	for(int j=0; j<cantNodos; j++) {
+        		if(distancias[i][j]==0) {
+        			distancias[i][j] =INF ;
+        		}
+        	}
+        }
+        
+		for (int k =0; k < cantNodos; k++) {
+			for (int i = 0; i < cantNodos; i++) {
+				for (int j = 0; j < cantNodos; j++) {
 					distancias[i][j] = Math.min(distancias[i][j], distancias[i][k] + distancias[k][j]);
 				}
 			}
 		}
 
-		for (int i = 1; i < cantNodos; i++) {
-			System.out.println("Nodo: " + i);
-			for (int j = 1; j < cantNodos; j++) {
-				System.out.println("distancia a " + j + " es " + distancias[i][j]);
+		for (int i = 0; i < cantNodos; i++) {
+			System.out.println("Nodo: " + (i+1));
+			for (int j = 0; j < cantNodos; j++) {
+				System.out.println("distancia a " + (j+1) + " es " + distancias[i][j]);
 			}
 			System.out.println("------------------------------");
 		}

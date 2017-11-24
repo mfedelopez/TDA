@@ -46,4 +46,19 @@ class test {
 		}
 		System.out.print("\n");
 	}
+	
+	@Test
+	void testFloyd() throws FileNotFoundException {
+		Grafo grafo=new Grafo();
+		grafo.leerGrafo();
+		int [][] resultado = grafo.floyd();
+		System.out.print("Floyd: \n");
+		for(int i=0; i<resultado.length;i++) {
+			for(int j=0; j<resultado.length;j++) {
+				System.out.print("["+resultado[i][j]+"]");
+			}
+			System.out.print("\n");
+		}
+		System.out.print("\n");
+	}
 }
