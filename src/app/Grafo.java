@@ -2,12 +2,19 @@ package app;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Vector;
 
 public class Grafo {
 	private int[][] nodos;
 	private int vectorVertices[];
+	final int INF = 9999;
+	final int INICIO = 1;
+	final int MAX = 9999;
 
 	public int[][] getMatriz() {
 		return this.nodos;
@@ -205,19 +212,19 @@ public class Grafo {
 
 	public void leerGrafo() throws FileNotFoundException {
 		String miPath = "C:\\Users\\fedee\\eclipse-workspace\\TDA\\";
-		Scanner sc = new Scanner(new File(miPath+"datos.in"));
-		int cantNodos =sc.nextInt();
+		Scanner sc = new Scanner(new File(miPath + "datos.in"));
+		int cantNodos = sc.nextInt();
 		int cantConexiones = sc.nextInt();
 		this.nodos = new int[cantNodos][cantNodos]; // vector para almacenar la lectura
-		
+
 		for (int i = 0; i < cantConexiones; i++) {
 			int nodoa = sc.nextInt();
 			int nodob = sc.nextInt();
 			int peso = sc.nextInt();
-			this.nodos[nodoa-1][nodob-1] = peso;
-			this.nodos[nodob-1][nodoa-1] = peso;			
+			this.nodos[nodoa - 1][nodob - 1] = peso;
+			this.nodos[nodob - 1][nodoa - 1] = peso;
 		}
-		
+
 		sc.close();
 	}
 
@@ -265,4 +272,134 @@ public class Grafo {
 		return arbol;
 	}
 
+	void dijkstra(int n) {
+		int inicio = n - 1;
+		int cantNodos = nodos.length;
+		int distancia[] = new int[cantNodos]; //Vector de salida, tiene los caminos minimos de N a cualquier otro de los nodos
+		Boolean nodosVisitados[] = new Boolean[cantNodos]; 
+		
+		//Inicializacion
+		for (int i = 0; i < cantNodos; i++) {
+			distancia[i] = MAX;
+			nodosVisitados[i] = false;
+		}
+		
+		//Distancia a si mismo es siempre 0
+		distancia[inicio] = 0;
+
+		//Aplico algoritmo de dijkstra
+		for (int i = 0; i < cantNodos - 1; i++) {
+			//Agarro la distancia minima de los que todavia no visite. 
+			int vertice = distanciaMinima(distancia, nodosVisitados);
+
+			//Lo marco como visitado para no volver a tocarlo
+			nodosVisitados[vertice] = true;
+
+			//Para el nodo que tome, sumo la distancia en el vector
+			for (int j = 0; j < cantNodos; j++) {
+				//Si no es un nodo que ya visite
+				//Y tengo una arista
+				//Y la distancia no es el maximo
+				//Y la distancia es menor
+				if (!nodosVisitados[j] && nodos[vertice][j] != 0 && distancia[vertice] != MAX && distancia[vertice] + nodos[vertice][j] < distancia[j]) {
+					//Sumo la distancia
+					distancia[j] = distancia[vertice] + nodos[vertice][j];
+				}
+			}
+		}
+
+		// saco por pantalla el resultado
+		printSolution(distancia, cantNodos);
+	}
+
+	// A utility function to print the constructed distance array
+	void printSolution(int dist[], int n) {
+		System.out.println("Distance from starting vertex");
+		for (int i = 0; i < nodos.length; i++)
+			System.out.println((i + 1) + " \t\t " + dist[i]);
+	}
+
+	int distanciaMinima(int distancia[], Boolean nodosVisitados[]) {
+		int min = MAX; 
+		int vertice = -1;
+
+		for (int i = 0; i < nodos.length; i++)
+			if (nodosVisitados[i] == false && distancia[i] <= min) {
+				min = distancia[i];
+				vertice = i;
+			}
+
+		return vertice;
+	}
+
+	int[][] prim() {
+        // uso una copia de ady porque necesito eliminar columnas
+    	int cantNodos = this.nodos.length;
+    	int cantAristasMarcadas = 0;
+    	final int INF = 9999;
+        int[][] adyacencia = this.nodos;
+        int[][] arbol = new int[cantNodos][cantNodos];
+        boolean[] aristasMarcadas = new boolean[cantNodos];
+        //vector<int> :: iterator itVec;
+
+        // Inicializo las distancias del arbol en INF.
+        for(int i = 0; i < cantNodos; i++) {
+        	for(int j=0;j<cantNodos;j++) {
+        		arbol[i][j] = INF;	
+        	}
+        	aristasMarcadas[i]=false;
+        }
+            
+
+        int padre = 0;
+        int hijo = 0;
+        while(cantAristasMarcadas + 1 < cantNodos){
+            padre = hijo;
+            // Marco la fila y elimino la columna del nodo padre.
+            aristasMarcadas[padre]=true;
+            cantAristasMarcadas++;
+            for(int i = 0; i < cantNodos; i++)
+                adyacencia[i][padre] = INF;
+
+            // Encuentro la menor distancia entre las filas marcadas.
+            // El nodo padre es la linea marcada y el nodo hijo es la columna del minimo.
+            int min = INF;
+            for(int i=0; i<cantNodos; i++)
+                for(int j = 0; j < cantNodos; j++)
+                    if(min > adyacencia[i][j]){
+                        min = adyacencia[i][j];
+                        padre = i;
+                        hijo = i;
+                    }
+
+            arbol[padre][hijo] = min;
+            arbol[hijo][padre] = min;
+        }
+        return arbol;
+    }
+	
+	
+	public int[][] floyd() {
+		int cantNodos = this.nodos.length+1;
+		int[][] distancias = this.nodos;// Arrays.copyOf(this.matAdyacencia, FINAL_ARRAY);
+
+		for (int k = 1; k < cantNodos; k++) {
+			for (int i = 1; i < cantNodos; i++) {
+				for (int j = 1; j < cantNodos; j++) {
+					distancias[i][j] = Math.min(distancias[i][j], distancias[i][k] + distancias[k][j]);
+				}
+			}
+		}
+
+		for (int i = 1; i < cantNodos; i++) {
+			System.out.println("Nodo: " + i);
+			for (int j = 1; j < cantNodos; j++) {
+				System.out.println("distancia a " + j + " es " + distancias[i][j]);
+			}
+			System.out.println("------------------------------");
+		}
+
+		return distancias;
+	}
+	
 }
